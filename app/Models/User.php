@@ -24,6 +24,17 @@ class User extends Authenticatable
         'password',
     ];
 
+
+    public function groups(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Group::class);
+    }
+
+    public function events(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Event::class);
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

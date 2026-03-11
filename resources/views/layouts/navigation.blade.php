@@ -15,6 +15,18 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('students.index')" :active="request()->routeIs('students.*')">
+                        {{ __('Alunos') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('groups.index')" :active="request()->routeIs('groups.*')">
+                        {{ __('Grupos') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('events.index')" :active="request()->routeIs('events.*')">
+                        {{ __('Frequência') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -43,7 +55,7 @@
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
+                                onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
@@ -89,7 +101,7 @@
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
+                        onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
