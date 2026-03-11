@@ -2,10 +2,15 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\OnboardingController;
 
 Route::get('/', function () {
     return view('welcome');
 });
+//rotas de cadastro
+Route::get('/cadastro', [OnboardingController::class, 'index'])->name('onboarding.index');
+Route::post('/cadastro', [OnboardingController::class, 'store'])->name('onboarding.store');
+Route::view('/obrigado', 'onboarding-success')->name('onboarding.success');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
