@@ -9,6 +9,7 @@ use App\Http\Controllers\PublicReportController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,7 +37,7 @@ Route::get('/', function () {
 */
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    
+
     // Dashboard Principal (Central de Inteligência)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -55,9 +56,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Rota para criar avaliação específica para um aluno
     Route::get('/students/{student}/evaluations/create', [EvaluationController::class, 'create'])->name('students.evaluations.create');
     Route::post('/students/{student}/evaluations', [EvaluationController::class, 'store'])->name('students.evaluations.store');
-    
+
     // Exportação para PDF
     Route::get('/avaliacoes/{evaluation}/pdf', [EvaluationController::class, 'exportPdf'])->name('evaluations.pdf');
+
+    Route::patch('/events/{event}/cancel', [EventController::class, 'cancel'])->name('events.cancel');
+
+    //rotas de usuários
+    Route::resource('users', UserController::class);
 
     // Perfil da Professora (Breeze Default)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -70,4 +76,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 | Rotas de Autenticação (Laravel Breeze)
 |--------------------------------------------------------------------------
 */
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

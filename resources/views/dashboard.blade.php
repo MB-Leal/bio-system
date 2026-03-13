@@ -42,6 +42,25 @@
                 <div class="p-5 border-b border-slate-50 flex justify-between items-center">
                     <h3 class="font-bold text-slate-800 italic">⚠️ Avaliações Pendentes (+30 dias)</h3>
                 </div>
+                <div class="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <span class="w-2 h-4 bg-emerald-500 rounded-full"></span>
+                        Ranking de Frequência (Top 5)
+                    </h3>
+                    <div class="space-y-4">
+                        @foreach($ranking as $student)
+                        <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-3xl">
+                            <div class="w-8 h-8 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black text-xs">
+                                {{ $loop->iteration }}º
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-bold text-slate-800">{{ $student->name }}</p>
+                                <p class="text-[10px] text-slate-400 uppercase">{{ $student->attendances_count }} Presenças</p>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
                 <div class="divide-y divide-slate-50">
                     @forelse($pendingEvaluations as $student)
                     <div class="p-4 flex items-center justify-between">

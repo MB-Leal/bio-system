@@ -11,9 +11,11 @@ class EvaluationController extends Controller
 {
     public function create(Student $student)
     {
-        return view('evaluations.create', compact('student'));
-    }
+        // Pegamos a última avaliação para servir de comparação
+        $latestEvaluation = $student->evaluations()->orderBy('evaluation_date', 'desc')->first();
 
+        return view('evaluations.create', compact('student', 'latestEvaluation'));
+    }
     public function store(Request $request, Student $student)
     {
         $data = $request->validate([
@@ -48,11 +50,11 @@ class EvaluationController extends Controller
     }
 
     public function publicReport($slug)
-{
-    $evaluation = \App\Models\Evaluation::where('hash_slug', $slug)
-        ->with('student')
-        ->firstOrFail();
+    {
+        $evaluation = \App\Models\Evaluation::where('hash_slug', $slug)
+            ->with('student')
+            ->firstOrFail();
 
-    return view('evaluations.public_report', compact('evaluation'));
-}
+        return view('evaluations.public_report', compact('evaluation'));
+    }
 }

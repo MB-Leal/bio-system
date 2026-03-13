@@ -13,6 +13,16 @@
             <form action="{{ route('students.update', $student) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
                 @csrf
                 @method('PATCH')
+                @if ($errors->any())
+                <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-r-lg shadow-sm">
+                    <p class="font-bold">Atenção! Verifique os seguintes erros:</p>
+                    <ul class="mt-2 list-disc list-inside text-sm">
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
 
                 <div class="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100">
                     <h3 class="text-lg font-black text-slate-800 mb-6 uppercase tracking-tighter flex items-center gap-2">
@@ -30,7 +40,13 @@
                         </div>
                         <div>
                             <x-input-label for="phone" :value="__('WhatsApp')" />
-                            <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full" :value="old('phone', $student->phone)" />
+                            <x-text-input
+                                name="phone"
+                                maxlength="11"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                placeholder="Ex: 91981223344"
+                                class="w-full mt-1"
+                                :value="old('phone', $student->phone ?? '')" />
                         </div>
                         <div>
                             <x-input-label for="birth_date" :value="__('Data de Nascimento')" />
@@ -52,7 +68,7 @@
                             <select name="group_id" class="mt-1 block w-full border-slate-200 rounded-2xl focus:ring-blue-500">
                                 <option value="">Sem Grupo</option>
                                 @foreach($groups as $group)
-                                    <option value="{{ $group->id }}" {{ old('group_id', $student->group_id) == $group->id ? 'selected' : '' }}>{{ $group->name }}</option>
+                                <option value="{{ $group->id }}" {{ old('group_id', $student->group_id) == $group->id ? 'selected' : '' }}>{{ $group->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -98,7 +114,7 @@
                             <x-input-label value="Alergias Conhecidas" />
                             <textarea name="allergies" rows="2" class="w-full mt-1 border-slate-200 rounded-2xl">{{ old('allergies', $student->allergies) }}</textarea>
                         </div>
-                        
+
                         <div class="md:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
                             <label class="flex items-center gap-2 p-3 bg-slate-50 rounded-xl cursor-pointer">
                                 <input type="checkbox" name="is_hypertensive" value="1" {{ old('is_hypertensive', $student->is_hypertensive) ? 'checked' : '' }}>
@@ -130,26 +146,28 @@
                         <span class="w-2 h-8 bg-blue-400 rounded-full"></span>
                         Quadro Clínico (PDF)
                     </h3>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                         <div>
                             <p class="text-sm text-slate-400 mb-4">Gerencie os exames e documentos anexados pelo aluno.</p>
                             @php
-                                $latestEval = $student->evaluations->sortByDesc('evaluation_date')->first();
+                            $latestEval = $student->evaluations->sortByDesc('evaluation_date')->first();
                             @endphp
-                            
+
                             @if($latestEval && $latestEval->exam_pdf_path)
-                                <div class="flex items-center gap-4 bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-4">
-                                    <svg class="w-8 h-8 text-rose-500" fill="currentColor" viewBox="0 0 20 20"><path d="M4 18h12a2 2 0 002-2V6a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2zm10-12a1 1 0 110 2h-4a1 1 0 110-2h4z"/></svg>
-                                    <div class="flex-1">
-                                        <p class="text-xs font-bold">Exame Atual</p>
-                                        <a href="{{ asset('storage/' . $latestEval->exam_pdf_path) }}" target="_blank" class="text-[10px] text-blue-400 underline uppercase font-black">Visualizar PDF</a>
-                                    </div>
+                            <div class="flex items-center gap-4 bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-4">
+                                <svg class="w-8 h-8 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M4 18h12a2 2 0 002-2V6a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2zm10-12a1 1 0 110 2h-4a1 1 0 110-2h4z" />
+                                </svg>
+                                <div class="flex-1">
+                                    <p class="text-xs font-bold">Exame Atual</p>
+                                    <a href="{{ asset('storage/' . $latestEval->exam_pdf_path) }}" target="_blank" class="text-[10px] text-blue-400 underline uppercase font-black">Visualizar PDF</a>
                                 </div>
+                            </div>
                             @else
-                                <div class="p-4 bg-slate-800/50 rounded-2xl border border-dashed border-slate-700 text-center text-xs text-slate-500 uppercase font-black">
-                                    Nenhum PDF anexado
-                                </div>
+                            <div class="p-4 bg-slate-800/50 rounded-2xl border border-dashed border-slate-700 text-center text-xs text-slate-500 uppercase font-black">
+                                Nenhum PDF anexado
+                            </div>
                             @endif
                         </div>
 

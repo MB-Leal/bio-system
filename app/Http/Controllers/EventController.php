@@ -56,7 +56,7 @@ class EventController extends Controller
     {
         // Carrega os alunos do grupo do evento e as presenças já marcadas
         $event->load(['group.students', 'attendances']);
-        
+
         return view('events.show', compact('event'));
     }
 
@@ -89,8 +89,9 @@ class EventController extends Controller
      */
     public function cancel(Event $event)
     {
-        $event->update(['status' => 'canceled']);
+        // Apenas eventos agendados podem ser cancelados
+        $event->update(['status' => 'cancelled']);
 
-        return back()->with('success', 'Evento cancelado. Ninguém será prejudicado no ranking.');
+        return redirect()->route('events.index')->with('success', 'Aula cancelada com sucesso!');
     }
 }

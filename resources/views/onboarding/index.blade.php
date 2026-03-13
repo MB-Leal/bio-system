@@ -1,8 +1,8 @@
 <x-guest-layout>
     <div class="py-12 bg-slate-50 min-h-screen" x-data="{ gender: 'F' }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            
-            <div class="text-center mb-12">                
+
+            <div class="text-center mb-12">
                 <h1 class="text-4xl font-black text-slate-800 tracking-tighter uppercase">Ficha de Avaliação Inicial</h1>
                 <p class="text-slate-500 text-lg">Bio-System: Inteligência em Composição Corporal</p>
             </div>
@@ -33,11 +33,17 @@
                         </div>
                         <div class="lg:col-span-2">
                             <x-input-label value="E-mail" />
-                            <x-text-input type="email" name="email" class="w-full mt-1" required />
+                            <x-text-input type="email" name="email" class="w-full mt-1" />
                         </div>
                         <div class="lg:col-span-2">
                             <x-input-label value="WhatsApp" />
-                            <x-text-input name="phone" placeholder="(00) 00000-0000" class="w-full mt-1" />
+                            <x-text-input
+                                name="phone"
+                                maxlength="11"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                placeholder="Ex: 91988887777"
+                                class="w-full mt-1"
+                                :value="old('phone', $student->phone ?? '')" />
                         </div>
                     </div>
                 </div>
@@ -50,18 +56,18 @@
                     <div class="grid grid-cols-1 xl:grid-cols-12 gap-12">
                         <div class="xl:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-5">
                             @php
-                                $medidas = [
-                                    'height' => 'Altura (m)', 'weight' => 'Peso (kg)', 'bust' => 'Busto',
-                                    'waist' => 'Cintura', 'abdomen' => 'Abdômen', 'hip' => 'Quadril',
-                                    'right_arm' => 'Braço Dir.', 'left_arm' => 'Braço Esq.', 'right_thigh' => 'Coxa Dir.',
-                                    'left_thigh' => 'Coxa Esq.', 'right_calf' => 'Panturrilha. Dir.', 'left_calf' => 'Panturrilha. Esq.'
-                                ];
+                            $medidas = [
+                            'height' => 'Altura (m)', 'weight' => 'Peso (kg)', 'bust' => 'Busto',
+                            'waist' => 'Cintura', 'abdomen' => 'Abdômen', 'hip' => 'Quadril',
+                            'right_arm' => 'Braço Dir.', 'left_arm' => 'Braço Esq.', 'right_thigh' => 'Coxa Dir.',
+                            'left_thigh' => 'Coxa Esq.', 'right_calf' => 'Panturrilha. Dir.', 'left_calf' => 'Panturrilha. Esq.'
+                            ];
                             @endphp
                             @foreach($medidas as $key => $label)
-                                <div>
-                                    <x-input-label value="{{ $label }}" />
-                                    <x-text-input name="{{ $key }}" step="0.01" type="number" class="w-full mt-1" />
-                                </div>
+                            <div>
+                                <x-input-label value="{{ $label }}" />
+                                <x-text-input name="{{ $key }}" step="0.01" type="number" class="w-full mt-1" />
+                            </div>
                             @endforeach
                         </div>
                         <div class="xl:col-span-5 bg-slate-50 p-8 rounded-[32px] border border-slate-200 flex flex-col items-center justify-center">
@@ -78,18 +84,18 @@
                     </h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
                         @php
-                            $bioFields = [
-                                'bmi' => 'IMC', 'body_fat_pct' => '% Gordura', 'fat_mass_kg' => 'Massa Gordura',
-                                'muscle_mass_pct' => 'Massa Muscular', 'lean_mass_kg' => 'Massa Magra',
-                                'body_water_pct' => 'Água Corporal', 'visceral_fat' => 'Gord. Visceral',
-                                'bone_mass' => 'Massa Óssea', 'bmr' => 'Taxa Metabólica', 'metabolic_age' => 'Idade Metabólica'
-                            ];
+                        $bioFields = [
+                        'bmi' => 'IMC', 'body_fat_pct' => '% Gordura', 'fat_mass_kg' => 'Massa Gordura',
+                        'muscle_mass_pct' => 'Massa Muscular', 'lean_mass_kg' => 'Massa Magra',
+                        'body_water_pct' => 'Água Corporal', 'visceral_fat' => 'Gord. Visceral',
+                        'bone_mass' => 'Massa Óssea', 'bmr' => 'Taxa Metabólica', 'metabolic_age' => 'Idade Metabólica'
+                        ];
                         @endphp
                         @foreach($bioFields as $key => $label)
-                            <div>
-                                <label class="text-[10px] font-black text-slate-500 uppercase mb-2 block tracking-widest">{{ $label }}</label>
-                                <input type="number" step="0.1" name="{{ $key }}" class="w-full bg-slate-800 border-slate-700 rounded-2xl text-white focus:ring-blue-400 focus:border-blue-400 py-3">
-                            </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-500 uppercase mb-2 block tracking-widest">{{ $label }}</label>
+                            <input type="number" step="0.1" name="{{ $key }}" class="w-full bg-slate-800 border-slate-700 rounded-2xl text-white focus:ring-blue-400 focus:border-blue-400 py-3">
+                        </div>
                         @endforeach
                     </div>
                 </div>
@@ -153,7 +159,9 @@
                     <div class="flex items-center justify-center w-full">
                         <label class="flex flex-col items-center justify-center w-full h-44 border-2 border-slate-300 border-dashed rounded-[32px] cursor-pointer bg-slate-50 hover:bg-slate-100 transition-all group">
                             <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                <svg class="w-12 h-12 mb-4 text-slate-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <svg class="w-12 h-12 mb-4 text-slate-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
                                 <p class="mb-2 text-sm text-slate-500 font-bold">Clique para enviar ou arraste o seu exame (PDF)</p>
                                 <p class="text-[10px] text-slate-400 uppercase tracking-widest">Tamanho máximo: 10MB</p>
                             </div>

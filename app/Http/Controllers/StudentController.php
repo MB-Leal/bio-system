@@ -22,10 +22,10 @@ class StudentController extends Controller
             ->where(function ($query) use ($user) {
                 // Alunos sem grupo (novos cadastros públicos)
                 $query->whereNull('group_id')
-                // OU alunos que pertencem aos grupos deste professor
-                ->orWhereHas('group', function ($q) use ($user) {
-                    $q->where('user_id', $user->id);
-                });
+                    // OU alunos que pertencem aos grupos deste professor
+                    ->orWhereHas('group', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    });
             })
             ->orderByRaw('group_id IS NULL DESC') // Novos no topo
             ->orderBy('created_at', 'desc')
@@ -68,7 +68,7 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
-        $student->load(['group', 'evaluations' => function($query) {
+        $student->load(['group', 'evaluations' => function ($query) {
             $query->orderBy('evaluation_date', 'desc');
         }]);
 
@@ -92,6 +92,12 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
+        // Limpa o telefone: remove parênteses, espaços e traços
+        $phoneCleaned = preg_replace('/[^0-9]/', '', $request->phone);
+
+        // Substitui o valor no request para a validação aceitar
+        $request->merge(['phone' => substr($phoneCleaned, 0, 11)]);
+
         $request->validate([
             'name'         => 'required|string|max:100',
             'email'        => 'required|email|max:100|unique:students,email,' . $student->id,
@@ -100,14 +106,21 @@ class StudentController extends Controller
             'gender'       => 'required|in:M,F',
             'height'       => 'required|numeric|min:0.5|max:2.5',
             'exam_pdf'     => 'nullable|mimes:pdf|max:10240',
+            'group_id' => 'nullable|exists:groups,id',
         ]);
 
         $data = $request->all();
 
         // Lógica para Checkboxes: se não vier no request, forçamos como falso/0
         $checkboxes = [
-            'is_smoker', 'has_pacemaker', 'is_hypertensive', 'is_hypotensive', 
-            'is_epileptic', 'is_diabetic', 'is_pregnant', 'regular_cycle'
+            'is_smoker',
+            'has_pacemaker',
+            'is_hypertensive',
+            'is_hypotensive',
+            'is_epileptic',
+            'is_diabetic',
+            'is_pregnant',
+            'regular_cycle'
         ];
 
         foreach ($checkboxes as $field) {
@@ -120,9 +133,9 @@ class StudentController extends Controller
         // Trata o Upload do PDF (Salva na avaliação mais recente)
         if ($request->hasFile('exam_pdf')) {
             $path = $request->file('exam_pdf')->store('exams', 'public');
-            
+
             $latestEval = $student->evaluations()->orderBy('evaluation_date', 'desc')->first();
-            
+
             if ($latestEval) {
                 // Deleta o PDF antigo se existir para economizar espaço
                 if ($latestEval->exam_pdf_path) {

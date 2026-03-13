@@ -17,6 +17,12 @@ class OnboardingController extends Controller
 
     public function store(Request $request)
     {
+        // Limpa o telefone: remove parênteses, espaços e traços
+        $phoneCleaned = preg_replace('/[^0-9]/', '', $request->phone);
+
+        // Substitui o valor no request para a validação aceitar
+        $request->merge(['phone' => substr($phoneCleaned, 0, 11)]);
+
         // 1. Validação com mensagens em Português (graças ao pacote que instalamos)
         $validated = $request->validate([
             'name' => 'required|string|max:100',
@@ -36,7 +42,7 @@ class OnboardingController extends Controller
             'birth_date' => $request->birth_date,
             'gender' => $request->gender,
             'height' => $request->height,
-            
+
             // Hábitos
             'sitting_time' => $request->sitting_time,
             'physical_activity' => $request->physical_activity,
@@ -84,7 +90,7 @@ class OnboardingController extends Controller
             'evaluation_date' => now(), // Já usará o horário de Belém configurado
             'hash_slug' => Str::random(10),
             'exam_pdf_path' => $path,
-            
+
             // Medidas de Fita
             'weight' => $request->weight,
             'bust' => $request->bust,

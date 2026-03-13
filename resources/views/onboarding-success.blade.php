@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro Concluído | Bio-System</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="bg-slate-50 antialiased text-slate-900">
 
     <div class="min-h-screen flex flex-col items-center justify-center p-4">
-        
+
         <div class="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center">
-            
+
             <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
@@ -33,7 +35,7 @@
                     </ul>
                 </div>
 
-                <a href="/" class="block w-full py-4 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors">
+                <a href="/cadastro" class="block w-full py-4 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors">
                     Voltar para o início
                 </a>
             </div>
@@ -45,4 +47,5 @@
     </div>
 
 </body>
+
 </html>
