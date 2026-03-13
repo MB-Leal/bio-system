@@ -61,20 +61,20 @@ class StudentController extends Controller
         return redirect()->route('students.index')->with('success', 'Aluno cadastrado com sucesso!');
     }
 
-    /**
-     * Exibe o perfil do aluno (Histórico de avaliações).
-     */
-    public function show(Student $student)
-    {
-        // Carrega as avaliações ordenadas pela mais recente
-        $evaluations = $student->evaluations()->orderBy('evaluation_date', 'desc')->get();
-        
-        return view('students.show', compact('student', 'evaluations'));
-    }
+    
+   public function show(Student $student)
+{
+    // Carrega o grupo e as avaliações ordenadas
+    $student->load(['group', 'evaluations' => function($query) {
+        $query->orderBy('evaluation_date', 'desc');
+    }]);
 
-    /**
-     * Formulário de edição.
-     */
+    $latestEvaluation = $student->evaluations->first();
+    $evaluations = $student->evaluations;
+
+    return view('students.show', compact('student', 'latestEvaluation', 'evaluations'));
+}
+
     public function edit(Student $student)
     {
         $groups = Auth::user()->groups()->orderBy('name')->get();

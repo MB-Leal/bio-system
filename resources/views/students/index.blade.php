@@ -91,11 +91,3 @@
         </div>
     </div>
 </x-app-layout>
-
-<script>
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Link do relatório copiado para a área de transferência!');
-    });
-}
-</script>

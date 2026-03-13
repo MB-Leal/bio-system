@@ -6,9 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Str;
 
+
 class Evaluation extends Model
 {
     protected $guarded = [];
+
+    protected $casts = [
+        'evaluation_date' => 'date',
+    ];
 
     // Relacionamento
     public function student()

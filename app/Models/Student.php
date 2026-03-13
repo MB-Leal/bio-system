@@ -9,13 +9,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Student extends Model
 {
     protected $fillable = [
-        'group_id', 
-        'name', 
-        'email', 
-        'birth_date', 
-        'gender', 
-        'height', 
+        'group_id',
+        'name',
+        'email',
+        'birth_date',
+        'gender',
+        'height',
         'health_notes'
+    ];
+
+    protected $casts = [
+        'birth_date' => 'date',
+        'created_at' => 'datetime',
     ];
 
     /**
