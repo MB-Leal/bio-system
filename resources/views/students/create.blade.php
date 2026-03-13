@@ -1,90 +1,59 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Cadastrar Novo Aluno') }}
+            {{ __('Cadastrar Novo Aluno (Ficha Completa)') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-3xl border border-slate-100">
-                <div class="p-8 text-gray-900">
-                    
-                    <form action="{{ route('students.store') }}" method="POST" class="space-y-6">
-                        @csrf
+    <div class="py-12" x-data="{ gender: 'F' }">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <form action="{{ route('students.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+                @csrf
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="md:col-span-2">
-                                <x-input-label for="name" :value="__('Nome Completo')" />
-                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus />
-                                <x-input-error class="mt-2" :messages="$errors->get('name')" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="email" :value="__('E-mail')" />
-                                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email')" required />
-                                <x-input-error class="mt-2" :messages="$errors->get('email')" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="group_id" :value="__('Vincular a um Grupo')" />
-                                <select name="group_id" id="group_id" class="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm transition-all">
-                                    <option value="">-- Selecione um Grupo (Opcional) --</option>
-                                    @foreach($groups as $group)
-                                        <option value="{{ $group->id }}" {{ old('group_id') == $group->id ? 'selected' : '' }}>
-                                            {{ $group->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <x-input-error class="mt-2" :messages="$errors->get('group_id')" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="birth_date" :value="__('Data de Nascimento')" />
-                                <x-text-input id="birth_date" name="birth_date" type="date" class="mt-1 block w-full" :value="old('birth_date')" required />
-                                <x-input-error class="mt-2" :messages="$errors->get('birth_date')" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="height" :value="__('Altura (m)')" />
-                                <x-text-input id="height" name="height" type="number" step="0.01" placeholder="Ex: 1.75" class="mt-1 block w-full" :value="old('height')" required />
-                                <x-input-error class="mt-2" :messages="$errors->get('height')" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="gender" :value="__('Gênero')" />
-                                <div class="mt-2 flex gap-4">
-                                    <label class="inline-flex items-center">
-                                        <input type="radio" name="gender" value="M" class="text-blue-600 border-gray-300 focus:ring-blue-500" {{ old('gender') == 'M' ? 'checked' : '' }} required>
-                                        <span class="ml-2 text-sm text-gray-600">Masculino</span>
-                                    </label>
-                                    <label class="inline-flex items-center">
-                                        <input type="radio" name="gender" value="F" class="text-blue-600 border-gray-300 focus:ring-blue-500" {{ old('gender') == 'F' ? 'checked' : '' }} required>
-                                        <span class="ml-2 text-sm text-gray-600">Feminino</span>
-                                    </label>
-                                </div>
-                                <x-input-error class="mt-2" :messages="$errors->get('gender')" />
-                            </div>
+                <div class="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100">
+                    <h3 class="text-lg font-black text-slate-800 mb-6 uppercase tracking-tighter flex items-center gap-2">
+                        <span class="w-2 h-8 bg-blue-600 rounded-full"></span>
+                        1. Dados Pessoais e Grupo
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="lg:col-span-2">
+                            <x-input-label for="name" :value="__('Nome Completo')" />
+                            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus />
                         </div>
-
                         <div>
-                            <x-input-label for="health_notes" :value="__('Observações de Saúde / Restrições')" />
-                            <textarea id="health_notes" name="health_notes" rows="3" class="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm">{{ old('health_notes') }}</textarea>
-                            <x-input-error class="mt-2" :messages="$errors->get('health_notes')" />
+                            <x-input-label for="email" :value="__('E-mail')" />
+                            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email')" required />
                         </div>
-
-                        <div class="flex items-center justify-end mt-4 gap-4">
-                            <a href="{{ route('students.index') }}" class="text-sm text-slate-400 hover:text-slate-600 font-bold uppercase tracking-widest">
-                                Cancelar
-                            </a>
-                            <x-primary-button class="bg-blue-600 hover:bg-blue-700">
-                                {{ __('Cadastrar Aluno') }}
-                            </x-primary-button>
+                        <div>
+                            <x-input-label for="phone" :value="__('WhatsApp')" />
+                            <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full" :value="old('phone')" placeholder="(00) 00000-0000" />
                         </div>
-                    </form>
-
+                        <div>
+                            <x-input-label for="birth_date" :value="__('Data de Nascimento')" />
+                            <x-text-input id="birth_date" name="birth_date" type="date" class="mt-1 block w-full" :value="old('birth_date')" required />
+                        </div>
+                        <div>
+                            <x-input-label for="gender" :value="__('Gênero')" />
+                            <select name="gender" x-model="gender" class="mt-1 block w-full border-slate-200 rounded-2xl focus:ring-blue-500">
+                                <option value="M" {{ old('gender') == 'M' ? 'selected' : '' }}>Masculino</option>
+                                <option value="F" {{ old('gender') == 'F' ? 'selected' : '' }}>Feminino</option>
+                            </select>
+                        </div>
+                        <div>
+                            <x-input-label for="height" :value="__('Altura Base (m)')" />
+                            <x-text-input name="height" type="number" step="0.01" class="mt-1 block w-full" :value="old('height')" placeholder="Ex: 1.70" />
+                        </div>
+                        <div>
+                            <x-input-label for="group_id" :value="__('Vincular ao Grupo')" />
+                            <select name="group_id" class="mt-1 block w-full border-slate-200 rounded-2xl focus:ring-blue-500">
+                                <option value="">Sem Grupo (Pendente)</option>
+                                @foreach($groups as $group)
+                                    <option value="{{ $group->id }}" {{ old('group_id') == $group->id ? 'selected' : '' }}>{{ $group->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</x-app-layout>
+
+                <div class="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100">
+                    <h3 class="text-lg font-black text-slate-

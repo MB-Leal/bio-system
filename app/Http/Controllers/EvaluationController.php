@@ -47,20 +47,12 @@ class EvaluationController extends Controller
         /*return redirect()->route('students.index')->with('success', 'Avaliação registrada com sucesso!');*/
     }
 
-    public function exportPdf(Evaluation $evaluation)
+    public function publicReport($slug)
 {
-    $student = $evaluation->student;
-    
-    // Pegamos a avaliação anterior para mostrar a evolução no PDF
-    $previous = $student->evaluations()
-        ->where('evaluation_date', '<', $evaluation->evaluation_date)
-        ->orderBy('evaluation_date', 'desc')
-        ->first();
+    $evaluation = \App\Models\Evaluation::where('hash_slug', $slug)
+        ->with('student')
+        ->firstOrFail();
 
-    // Carrega a view específica para PDF
-    $pdf = Pdf::loadView('reports.pdf', compact('evaluation', 'student', 'previous'));
-
-    // Retorna o download do arquivo com nome personalizado
-    return $pdf->download("Relatorio-{$student->name}-{$evaluation->evaluation_date->format('d-m-Y')}.pdf");
+    return view('evaluations.public_report', compact('evaluation'));
 }
 }

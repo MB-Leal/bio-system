@@ -16,8 +16,8 @@ use App\Http\Controllers\DashboardController;
 |--------------------------------------------------------------------------
 */
 
-// Relatório Visual (Link compartilhado via WhatsApp)
-Route::get('/e/{hash}', [PublicReportController::class, 'show'])->name('public.report');
+// Relatório Visual - Link compartilhado
+Route::get('/e/{slug}', [EvaluationController::class, 'publicReport'])->name('public.report');
 
 // Fluxo de Auto-cadastro do Aluno
 Route::get('/cadastro', [OnboardingController::class, 'index'])->name('onboarding.index');
