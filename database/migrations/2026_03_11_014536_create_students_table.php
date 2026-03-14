@@ -14,11 +14,12 @@ return new class extends Migration
 
             // 1. Dados Pessoais
             $table->string('name', 100);
-            $table->string('email', 100);
+            $table->string('email', 100)->unique()->change();
             $table->string('phone')->nullable();
             $table->date('birth_date');
             $table->enum('gender', ['M', 'F']);
             $table->float('height'); // Altura base
+            $table->decimal('weight', 5, 2)->nullable();
 
             // 2. Anamnese - Hábitos e Estilo de Vida
             $table->text('sitting_time')->nullable(); // Muito tempo sentada?

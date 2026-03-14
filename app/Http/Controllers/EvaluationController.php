@@ -10,12 +10,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class EvaluationController extends Controller
 {
     public function create(Student $student)
-    {
-        // Pegamos a última avaliação para servir de comparação
-        $latestEvaluation = $student->evaluations()->orderBy('evaluation_date', 'desc')->first();
+{
+    // Busca a última avaliação para comparar
+    $latestEvaluation = $student->evaluations()->latest('evaluation_date')->first();
 
-        return view('evaluations.create', compact('student', 'latestEvaluation'));
-    }
+    return view('evaluations.create', compact('student', 'latestEvaluation'));
+}
     public function store(Request $request, Student $student)
 {
     // 1. Validação robusta

@@ -48,17 +48,22 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name'         => 'required|string|max:255',
-            'email'        => 'required|email|unique:students,email',
-            'birth_date'   => 'required|date',
-            'gender'       => 'required|in:M,F',
-            'height'       => 'required|numeric|min:0.5|max:2.5',
-            'group_id'     => 'nullable|exists:groups,id',
-        ]);
+        // Limpa o telefone antes de validar e salvar
+    $phone = preg_replace('/[^0-9]/', '', $request->phone);
+    $request->merge(['phone' => $phone]);
 
-        // Captura todos os dados (Model deve ter protected $guarded = [])
-        Student::create($request->all());
+    $request->validate([
+        'name'         => 'required|string|max:255',
+        'email'        => 'required|email|unique:students,email',
+        'phone'        => 'nullable|string|digits:11', // Garante os 11 dígitos
+        'birth_date'   => 'required|date',
+        'gender'       => 'required|in:M,F',
+        'height'       => 'required|numeric',
+        'weight' => 'nullable|numeric',
+        'group_id'     => 'nullable|exists:groups,id',
+    ]);
+
+    Student::create($request->all());
 
         return redirect()->route('students.index')->with('success', 'Aluno cadastrado com sucesso!');
     }
@@ -105,6 +110,7 @@ class StudentController extends Controller
             'birth_date'   => 'required|date',
             'gender'       => 'required|in:M,F',
             'height'       => 'required|numeric|min:0.5|max:2.5',
+            'weight' => 'nullable|numeric',
             'exam_pdf'     => 'nullable|mimes:pdf|max:10240',
             'group_id' => 'nullable|exists:groups,id',
         ]);
@@ -164,4 +170,22 @@ class StudentController extends Controller
         $student->delete();
         return redirect()->route('students.index')->with('success', 'Aluno removido com sucesso.');
     }
+    public function report(Student $student)
+{
+    // Pegamos todas as avaliações ordenadas para o gráfico
+    $evaluations = $student->evaluations()->orderBy('evaluation_date', 'asc')->get();
+
+    if ($evaluations->count() < 2) {
+        return redirect()->route('students.show', $student)
+            ->with('error', 'É necessário pelo menos 2 avaliações para gerar um comparativo.');
+    }
+
+    // Preparação de dados para o Chart.js
+    $labels = $evaluations->pluck('evaluation_date')->map(fn($d) => $d->format('d/m/y'));
+    $weights = $evaluations->pluck('weight');
+    $fat = $evaluations->pluck('body_fat_pct');
+    $muscle = $evaluations->pluck('muscle_mass_pct');
+
+    return view('students.report', compact('student', 'evaluations', 'labels', 'weights', 'fat', 'muscle'));
+}
 }

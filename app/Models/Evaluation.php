@@ -15,6 +15,25 @@ class Evaluation extends Model
         'evaluation_date' => 'date',
     ];
 
+    protected $fillable = [
+        'student_id',
+        'evaluation_date',
+        'weight',
+        'height',
+        'body_fat_pct',
+        'visceral_fat',
+        'muscle_mass_pct',
+        'waist',
+        'abdomen',
+        'hip',
+        'right_arm',
+        'left_arm',
+        'right_thigh',
+        'left_thigh',
+        'right_calf',
+        'left_calf',
+    ];
+
     // Relacionamento
     public function student()
     {

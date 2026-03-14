@@ -20,6 +20,9 @@ use App\Http\Controllers\UserController;
 // Relatório Visual - Link compartilhado
 Route::get('/e/{slug}', [EvaluationController::class, 'publicReport'])->name('public.report');
 
+// Rota pública para o relatório do aluno
+Route::get('/relatorio/{slug}', [PublicReportController::class, 'show'])->name('public.report');
+
 // Fluxo de Auto-cadastro do Aluno
 Route::get('/cadastro', [OnboardingController::class, 'index'])->name('onboarding.index');
 Route::post('/cadastro', [OnboardingController::class, 'store'])->name('onboarding.store');
@@ -46,6 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Gestão de Alunos (Listagem, Edição, Vínculo com Grupo)
     Route::resource('students', StudentController::class);
+    Route::get('/students/{student}/report', [App\Http\Controllers\StudentController::class, 'report'])->name('students.report');
 
     // Gestão de Eventos e Chamada (Aulas de Terça, Sábado e Extras)
     Route::resource('events', EventController::class);

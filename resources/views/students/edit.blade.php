@@ -64,6 +64,11 @@
                             <x-text-input name="height" type="number" step="0.01" class="mt-1 block w-full" :value="old('height', $student->height)" />
                         </div>
                         <div>
+                            <x-input-label value="Peso Inicial (kg)" />
+                            <x-text-input name="weight" type="number" step="0.1" class="w-full mt-1" :value="old('weight', $student->weight)" placeholder="Ex: 85.5" />
+                            <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold italic text-center">Peso base do cadastro</p>
+                        </div>
+                        <div>
                             <x-input-label for="group_id" :value="__('Grupo')" />
                             <select name="group_id" class="mt-1 block w-full border-slate-200 rounded-2xl focus:ring-blue-500">
                                 <option value="">Sem Grupo</option>

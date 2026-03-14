@@ -11,11 +11,22 @@ class Student extends Model
     protected $fillable = [
         'group_id',
         'name',
+        'phone',
         'email',
         'birth_date',
         'gender',
         'height',
-        'health_notes'
+        'weight',
+        'health_notes',
+        'is_smoker',
+        'is_hypertensive',
+        'is_diabetic',
+        'has_pacemaker',
+        'is_epileptic',
+        'surgeries',
+        'children_count',
+        'is_pregnant',
+        'contraception_method',
     ];
 
     protected $casts = [

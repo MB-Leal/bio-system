@@ -33,7 +33,10 @@
                         </div>
                         <div class="lg:col-span-2">
                             <x-input-label value="E-mail" />
-                            <x-text-input type="email" name="email" class="w-full mt-1" />
+                            <x-text-input type="email" name="email" class="w-full mt-1" :value="old('email')" required />
+    @error('email')
+        <p class="text-xs text-rose-500 mt-1 font-bold">{{ $message }}</p>
+    @enderror
                         </div>
                         <div class="lg:col-span-2">
                             <x-input-label value="WhatsApp" />
@@ -45,6 +48,17 @@
                                 class="w-full mt-1"
                                 :value="old('phone', $student->phone ?? '')" />
                         </div>
+                    </div>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-[32px] shadow-sm flex items-center gap-4">
+                    <div class="bg-blue-500 text-white p-2 rounded-full shadow-md">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-blue-800 font-bold text-sm">Informação importante:</p>
+                        <p class="text-blue-700 text-sm">Se não tem os dados abaixo, ou não sabe como preencher, deixe em branco. Na avaliação presencial é possível corrigir.</p>
                     </div>
                 </div>
 

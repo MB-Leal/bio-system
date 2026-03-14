@@ -72,4 +72,15 @@ class UserController extends Controller
         $user->delete();
         return redirect()->route('users.index')->with('success', 'Usuário removido.');
     }
+    public function show(Student $student)
+{
+    // Carrega as avaliações da mais recente para a mais antiga
+    $evaluations = $student->evaluations()->orderBy('evaluation_date', 'desc')->get();
+    
+    // Pega a primeira e a última para comparar a evolução total
+    $first = $evaluations->last();
+    $latest = $evaluations->first();
+
+    return view('students.show', compact('student', 'evaluations', 'first', 'latest'));
+}
 }

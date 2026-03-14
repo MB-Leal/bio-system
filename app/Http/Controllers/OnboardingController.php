@@ -30,7 +30,10 @@ class OnboardingController extends Controller
             'birth_date' => 'required|date',
             'gender' => 'required|in:M,F',
             'height' => 'required|numeric',
-            'exam_pdf' => 'nullable|mimes:pdf|max:10240', // Aumentei para 10MB
+            'exam_pdf' => 'nullable|mimes:pdf|max:10240',
+        ], [
+            // Mensagem personalizada (opcional)
+            'email.unique' => 'Este e-mail já está cadastrado em nosso sistema.'
         ]);
 
         // 2. Criar o Aluno (Anamnese e Dados Fixos)

@@ -78,6 +78,10 @@
                                 required />
                         </div>
                         <div>
+        <x-input-label value="Peso Inicial (kg)" />
+        <x-text-input name="weight" type="number" step="0.1" class="w-full mt-1" placeholder="Ex: 80.5" :value="old('weight')" />
+    </div>
+                        <div>
                             <x-input-label value="Grupo" />
                             <select name="group_id" class="w-full mt-1 border-slate-200 rounded-2xl focus:ring-blue-500">
                                 <option value="">Sem Grupo</option>
