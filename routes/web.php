@@ -17,9 +17,6 @@ use App\Http\Controllers\UserController;
 |--------------------------------------------------------------------------
 */
 
-// Relatório Visual - Link compartilhado
-Route::get('/e/{slug}', [EvaluationController::class, 'publicReport'])->name('public.report');
-
 // Rota pública para o relatório do aluno
 Route::get('/relatorio/{slug}', [PublicReportController::class, 'show'])->name('public.report');
 
