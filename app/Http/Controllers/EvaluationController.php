@@ -17,37 +17,33 @@ class EvaluationController extends Controller
         return view('evaluations.create', compact('student', 'latestEvaluation'));
     }
     public function store(Request $request, Student $student)
-    {
-        $data = $request->validate([
-            'evaluation_date' => 'required|date',
-            'weight' => 'required|numeric',
-            'body_fat_pct' => 'required|numeric',
-            'muscle_mass_pct' => 'required|numeric',
-            'visceral_fat' => 'required|integer',
-            'body_water_pct' => 'required|numeric',
-            'metabolic_age' => 'required|integer',
-            'bmr' => 'required|integer',
-            // Medidas são opcionais
-            'neck' => 'nullable|numeric',
-            'chest' => 'nullable|numeric',
-            'waist' => 'nullable|numeric',
-            'abdomen' => 'nullable|numeric',
-            'hip' => 'nullable|numeric',
-            'right_arm' => 'nullable|numeric',
-            'left_arm' => 'nullable|numeric',
-            'right_thigh' => 'nullable|numeric',
-            'left_thigh' => 'nullable|numeric',
-        ]);
+{
+    // 1. Validação robusta
+    $validated = $request->validate([
+        'weight' => 'required|numeric',
+        'body_fat_pct' => 'required|numeric',
+        'visceral_fat' => 'nullable|numeric',
+        'muscle_mass_pct' => 'nullable|numeric',
+        'waist' => 'nullable|numeric',
+        'abdomen' => 'nullable|numeric',
+        'hip' => 'nullable|numeric',
+        'right_arm' => 'nullable|numeric',
+        'left_arm' => 'nullable|numeric',
+        'right_thigh' => 'nullable|numeric',
+        'left_thigh' => 'nullable|numeric',
+        // Adicione outros campos que você deseja validar aqui
+    ]);
 
-        $student->evaluations()->create($data);
+    // 2. Adiciona dados automáticos
+    $validated['student_id'] = $student->id;
+    $validated['evaluation_date'] = now(); // Define a data de hoje automaticamente
 
-        return view('evaluations.success', [
-            'evaluation' => $evaluation,
-            'whatsappUrl' => $evaluation->getWhatsappUrl()
-        ]);
+    // 3. Cria o registro
+    Evaluation::create($validated);
 
-        /*return redirect()->route('students.index')->with('success', 'Avaliação registrada com sucesso!');*/
-    }
+    return redirect()->route('students.show', $student)
+                     ->with('success', 'Avaliação salva com sucesso!');
+}
 
     public function publicReport($slug)
     {
