@@ -14,19 +14,25 @@ return new class extends Migration
 
             // 1. Dados Pessoais
             $table->string('name', 100);
-            $table->string('email', 100)->unique()->change();
+
+            // CORREÇÃO: Removido o ->change() e definido o email como único aqui.
+            // O limite de 100 caracteres é bom para performance.
+            $table->string('email', 100)->unique();
+
             $table->string('phone')->nullable();
             $table->date('birth_date');
             $table->enum('gender', ['M', 'F']);
-            $table->float('height'); // Altura base
+
+            // DICA: Use decimal para altura (ex: 1.75) para evitar imprecisões do float
+            $table->decimal('height', 4, 2);
             $table->decimal('weight', 5, 2)->nullable();
 
             // 2. Anamnese - Hábitos e Estilo de Vida
-            $table->text('sitting_time')->nullable(); // Muito tempo sentada?
-            $table->text('physical_activity')->nullable(); // Pratica atividade?
+            $table->text('sitting_time')->nullable();
+            $table->text('physical_activity')->nullable();
             $table->boolean('is_smoker')->default(false);
-            $table->text('diet_type')->nullable(); // Alimentação balanceada?
-            $table->text('fluid_intake')->nullable(); // Ingestão de líquidos?
+            $table->text('diet_type')->nullable();
+            $table->text('fluid_intake')->nullable();
 
             // 3. Histórico Médico e Saúde Geral
             $table->text('surgeries')->nullable();
@@ -37,7 +43,7 @@ return new class extends Migration
             $table->text('current_medical_treatment')->nullable();
             $table->text('skin_acids')->nullable();
             $table->text('orthomolecular_treatment')->nullable();
-            $table->text('body_care_products')->nullable(); // Cuidados com pele/corpo
+            $table->text('body_care_products')->nullable();
 
             // 4. Condições Médicas Específicas
             $table->boolean('has_pacemaker')->default(false);
@@ -56,10 +62,12 @@ return new class extends Migration
             $table->boolean('regular_cycle')->default(true);
             $table->text('contraception_method')->nullable();
 
-            $table->text('health_notes')->nullable(); // Campo geral de notas
+            $table->text('health_notes')->nullable();
             $table->timestamps();
 
-            $table->unique(['name', 'email']);
+            // REMOVIDO: $table->unique(['name', 'email']); 
+            // Motivo: Se o e-mail já é único, você não precisa desta chave composta. 
+            // Chaves compostas permitem o mesmo e-mail em nomes diferentes, o que você não quer.
         });
     }
 
