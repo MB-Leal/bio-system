@@ -20,23 +20,18 @@ class StudentController extends Controller
 
         $students = Student::with('group')
             ->where(function ($query) use ($user) {
-                // Alunos sem grupo (novos cadastros públicos)
                 $query->whereNull('group_id')
-                    // OU alunos que pertencem aos grupos deste professor
                     ->orWhereHas('group', function ($q) use ($user) {
                         $q->where('user_id', $user->id);
                     });
             })
-            ->orderByRaw('group_id IS NULL DESC') // Novos no topo
+            ->orderByRaw('group_id IS NULL DESC')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         return view('students.index', compact('students'));
     }
 
-    /**
-     * Formulário de criação manual.
-     */
     public function create()
     {
         $groups = Auth::user()->groups()->orderBy('name')->get();
@@ -44,33 +39,23 @@ class StudentController extends Controller
     }
 
     /**
-     * Salva um novo aluno manualmente.
+     * Salva um novo aluno (Cadastro Manual ou Onboarding).
      */
     public function store(Request $request)
     {
-        // Limpa o telefone antes de validar e salvar
-    $phone = preg_replace('/[^0-9]/', '', $request->phone);
-    $request->merge(['phone' => $phone]);
+        $this->validateStudent($request);
 
-    $request->validate([
-        'name'         => 'required|string|max:255',
-        'email'        => 'required|email|unique:students,email',
-        'phone'        => 'nullable|string|digits:11', // Garante os 11 dígitos
-        'birth_date'   => 'required|date',
-        'gender'       => 'required|in:M,F',
-        'height'       => 'required|numeric',
-        'weight' => 'nullable|numeric',
-        'group_id'     => 'nullable|exists:groups,id',
-    ]);
+        $data = $request->all();
+        
+        // Tratamento de Checkboxes (booleanos)
+        $data['has_fracture'] = $request->has('has_fracture');
+        $data['is_pregnant'] = $request->has('is_pregnant');
 
-    Student::create($request->all());
+        Student::create($data);
 
         return redirect()->route('students.index')->with('success', 'Aluno cadastrado com sucesso!');
     }
 
-    /**
-     * Exibe o perfil detalhado (Histórico e Anamnese).
-     */
     public function show(Student $student)
     {
         $student->load(['group', 'evaluations' => function ($query) {
@@ -83,9 +68,6 @@ class StudentController extends Controller
         return view('students.show', compact('student', 'latestEvaluation', 'evaluations'));
     }
 
-    /**
-     * Formulário de edição com grupos do professor.
-     */
     public function edit(Student $student)
     {
         $groups = Auth::user()->groups()->orderBy('name')->get();
@@ -93,99 +75,104 @@ class StudentController extends Controller
     }
 
     /**
-     * Atualiza os dados do aluno e processa o PDF de exame.
+     * Atualiza os dados do aluno.
      */
     public function update(Request $request, Student $student)
     {
-        // Limpa o telefone: remove parênteses, espaços e traços
-        $phoneCleaned = preg_replace('/[^0-9]/', '', $request->phone);
-
-        // Substitui o valor no request para a validação aceitar
-        $request->merge(['phone' => substr($phoneCleaned, 0, 11)]);
-
-        $request->validate([
-            'name'         => 'required|string|max:100',
-            'email'        => 'required|email|max:100|unique:students,email,' . $student->id,
-            'group_id'     => 'nullable|exists:groups,id',
-            'birth_date'   => 'required|date',
-            'gender'       => 'required|in:M,F',
-            'height'       => 'required|numeric|min:0.5|max:2.5',
-            'weight' => 'nullable|numeric',
-            'exam_pdf'     => 'nullable|mimes:pdf|max:10240',
-            'group_id' => 'nullable|exists:groups,id',
-        ]);
+        $this->validateStudent($request, $student->id);
 
         $data = $request->all();
 
-        // Lógica para Checkboxes: se não vier no request, forçamos como falso/0
-        $checkboxes = [
-            'is_smoker',
-            'has_pacemaker',
-            'is_hypertensive',
-            'is_hypotensive',
-            'is_epileptic',
-            'is_diabetic',
-            'is_pregnant',
-            'regular_cycle'
-        ];
+        // Tratamento de Checkboxes
+        $data['has_fracture'] = $request->has('has_fracture');
+        $data['is_pregnant'] = $request->has('is_pregnant');
 
-        foreach ($checkboxes as $field) {
-            $data[$field] = $request->has($field);
-        }
-
-        // Atualiza os dados do Aluno
         $student->update($data);
 
-        // Trata o Upload do PDF (Salva na avaliação mais recente)
+        // Tratamento de Upload de PDF
         if ($request->hasFile('exam_pdf')) {
             $path = $request->file('exam_pdf')->store('exams', 'public');
-
             $latestEval = $student->evaluations()->orderBy('evaluation_date', 'desc')->first();
 
             if ($latestEval) {
-                // Deleta o PDF antigo se existir para economizar espaço
                 if ($latestEval->exam_pdf_path) {
                     Storage::disk('public')->delete($latestEval->exam_pdf_path);
                 }
                 $latestEval->update(['exam_pdf_path' => $path]);
             } else {
-                // Se o aluno não tiver avaliações ainda, criamos uma inicial para guardar o PDF
                 $student->evaluations()->create([
                     'evaluation_date' => now(),
                     'exam_pdf_path' => $path,
                     'hash_slug' => Str::random(10),
-                    'weight' => 0 // Valor placeholder
+                    'weight' => $student->weight ?? 0
                 ]);
             }
         }
 
-        return redirect()->route('students.show', $student)->with('success', 'Ficha do aluno atualizada com sucesso!');
+        return redirect()->route('students.show', $student)->with('success', 'Ficha atualizada com sucesso!');
     }
 
     /**
-     * Remove o aluno do sistema.
+     * Função auxiliar de validação para evitar repetição de código.
      */
+    protected function validateStudent(Request $request, $id = null)
+    {
+        // Limpeza de telefone
+        $phone = preg_replace('/[^0-9]/', '', $request->phone);
+        $request->merge(['phone' => $phone]);
+
+        return $request->validate([
+            // Dados Pessoais
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|max:100|unique:students,email' . ($id ? ",$id" : ""),
+            'cell_group' => 'nullable|string',
+            'phone' => 'nullable|string|max:11',
+            'birth_date' => 'required|date',
+            'gender' => 'required|in:M,F',
+            'group_id' => 'nullable|exists:groups,id',
+
+            // Medidas e Bioimpedância (Garante que sejam números)
+            'height' => 'required|numeric',
+            'weight' => 'nullable|numeric',
+            'bust' => 'nullable|numeric',
+            'waist' => 'nullable|numeric',
+            'abdomen' => 'nullable|numeric',
+            'hip' => 'nullable|numeric',
+            'right_arm' => 'nullable|numeric',
+            'left_arm' => 'nullable|numeric',
+            'right_thigh' => 'nullable|numeric',
+            'left_thigh' => 'nullable|numeric',
+            'right_calf' => 'nullable|numeric',
+            'left_calf' => 'nullable|numeric',
+            'body_fat_pct' => 'nullable|numeric',
+            'muscle_mass_pct' => 'nullable|numeric',
+            'visceral_fat' => 'nullable|integer',
+
+            // PDF
+            'exam_pdf' => 'nullable|mimes:pdf|max:10240',
+        ]);
+    }
+
     public function destroy(Student $student)
     {
         $student->delete();
-        return redirect()->route('students.index')->with('success', 'Aluno removido com sucesso.');
+        return redirect()->route('students.index')->with('success', 'Aluno removido.');
     }
+
     public function report(Student $student)
-{
-    // Pegamos todas as avaliações ordenadas para o gráfico
-    $evaluations = $student->evaluations()->orderBy('evaluation_date', 'asc')->get();
+    {
+        $evaluations = $student->evaluations()->orderBy('evaluation_date', 'asc')->get();
 
-    if ($evaluations->count() < 2) {
-        return redirect()->route('students.show', $student)
-            ->with('error', 'É necessário pelo menos 2 avaliações para gerar um comparativo.');
+        if ($evaluations->count() < 2) {
+            return redirect()->route('students.show', $student)
+                ->with('error', 'São necessárias 2 avaliações para o comparativo.');
+        }
+
+        $labels = $evaluations->pluck('evaluation_date')->map(fn($d) => $d->format('d/m/y'));
+        $weights = $evaluations->pluck('weight');
+        $fat = $evaluations->pluck('body_fat_pct');
+        $muscle = $evaluations->pluck('muscle_mass_pct');
+
+        return view('students.report', compact('student', 'evaluations', 'labels', 'weights', 'fat', 'muscle'));
     }
-
-    // Preparação de dados para o Chart.js
-    $labels = $evaluations->pluck('evaluation_date')->map(fn($d) => $d->format('d/m/y'));
-    $weights = $evaluations->pluck('weight');
-    $fat = $evaluations->pluck('body_fat_pct');
-    $muscle = $evaluations->pluck('muscle_mass_pct');
-
-    return view('students.report', compact('student', 'evaluations', 'labels', 'weights', 'fat', 'muscle'));
-}
 }

@@ -34,9 +34,9 @@
                         <div class="lg:col-span-2">
                             <x-input-label value="E-mail" />
                             <x-text-input type="email" name="email" class="w-full mt-1" :value="old('email')" required />
-    @error('email')
-        <p class="text-xs text-rose-500 mt-1 font-bold">{{ $message }}</p>
-    @enderror
+                            @error('email')
+                            <p class="text-xs text-rose-500 mt-1 font-bold">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="lg:col-span-2">
                             <x-input-label value="WhatsApp" />
@@ -47,6 +47,18 @@
                                 placeholder="Ex: 91988887777"
                                 class="w-full mt-1"
                                 :value="old('phone', $student->phone ?? '')" />
+                        </div>
+                        <div class="lg:col-span-2">
+                            <x-input-label value="Você participa de alguma célula?" />
+                            <select name="cell_group" class="w-full mt-1 border-slate-200 rounded-2xl focus:ring-blue-500 h-[46px]">
+                                <option value="Não">Não participo</option>
+                                @for ($i = 1; $i <= 38; $i++)
+                                    @php $val='CL' . str_pad($i, 2, '0' , STR_PAD_LEFT); @endphp
+                                    <option value="{{ $val }}" {{ old('cell_group') == $val ? 'selected' : '' }}>
+                                    {{ $val }}
+                                    </option>
+                                    @endfor
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -71,7 +83,7 @@
                         <div class="xl:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-5">
                             @php
                             $medidas = [
-                            'height' => 'Altura (m)', 'weight' => 'Peso (kg)', 'bust' => 'Busto',
+                            'height' => 'Altura (m) ex: 1.70', 'weight' => 'Peso (kg)', 'bust' => 'Busto',
                             'waist' => 'Cintura', 'abdomen' => 'Abdômen', 'hip' => 'Quadril',
                             'right_arm' => 'Braço Dir.', 'left_arm' => 'Braço Esq.', 'right_thigh' => 'Coxa Dir.',
                             'left_thigh' => 'Coxa Esq.', 'right_calf' => 'Panturrilha. Dir.', 'left_calf' => 'Panturrilha. Esq.'
@@ -125,9 +137,6 @@
                             <h3 class="font-black text-slate-400 uppercase text-[10px] tracking-widest border-b pb-2">Hábitos</h3>
                             <div><x-input-label value="Permanece muito tempo sentada?" /><x-text-input name="sitting_time" class="w-full mt-1" /></div>
                             <div><x-input-label value="Atividade física? Quais?" /><x-text-input name="physical_activity" class="w-full mt-1" /></div>
-                            <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl">
-                                <input type="checkbox" name="is_smoker" class="rounded text-purple-600"> <span class="text-sm font-bold text-slate-700">É fumante?</span>
-                            </div>
                         </div>
 
                         <div class="space-y-4" x-data="{ sur: false, ort: false }">
@@ -154,13 +163,33 @@
                     </div>
 
                     <div x-show="gender === 'F'" x-transition class="mt-12 pt-10 border-t border-rose-100">
-                        <h3 class="font-black text-rose-500 uppercase text-[10px] tracking-widest mb-6 italic">Saúde Feminina</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            <div class="flex items-center gap-3 p-4 bg-rose-50 rounded-2xl">
-                                <input type="checkbox" name="is_pregnant" class="rounded text-rose-500"> <span class="text-sm font-bold text-rose-700">Gestante?</span>
+                        <div x-data="{ hasFracture: false }" class="space-y-6">
+                            <h3 class="font-black text-rose-500 uppercase text-[10px] tracking-widest mb-4 italic">Histórico de Fraturas e Lesões</h3>
+
+                            <div class="p-4 bg-rose-50/50 rounded-2xl border border-rose-100">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" x-model="hasFracture" name="has_fracture" class="rounded text-rose-500 focus:ring-rose-500">
+                                    <span class="text-sm font-bold text-rose-700">Você já sofreu alguma fratura?</span>
+                                </label>
+
+                                <div x-show="hasFracture" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-2" class="mt-6 space-y-4 border-t border-rose-200/50 pt-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <x-input-label value="Local da fratura/cirurgia" />
+                                            <x-text-input name="fracture_location" placeholder="Ex: Fêmur direito, rádio distal" class="w-full mt-1 text-sm" />
+                                        </div>
+                                        <div>
+                                            <x-input-label value="Data aproximada" />
+                                            <x-text-input name="fracture_date" placeholder="Ex: Março de 2022 ou há 5 anos" class="w-full mt-1 text-sm" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <x-input-label value="Presença de implantes (Pinos, placas, parafusos ou próteses?)" />
+                                        <x-text-input name="implants_details" placeholder="Especifique se possui algum material metálico no local" class="w-full mt-1 text-sm" />
+                                    </div>
+                                </div>
                             </div>
-                            <div><x-input-label value="Filhos (Nº)" /><x-text-input type="number" name="children_count" class="w-full mt-1" /></div>
-                            <div class="md:col-span-2"><x-input-label value="Anticoncepcional (Qual?)" /><x-text-input name="contraception_method" class="w-full mt-1" /></div>
                         </div>
                     </div>
                 </div>
@@ -170,6 +199,7 @@
                         <span class="bg-slate-800 text-white w-10 h-10 rounded-2xl flex items-center justify-center text-base shadow-lg shadow-slate-100">5</span>
                         Quadro Clínico (Anexar Exame)
                     </h2>
+                    <p class="text-slate-400 text-xs mb-8 ml-13 uppercase font-bold tracking-widest italic">Apenas se tiver exames recentes, anexe abaixo</p>
                     <div class="flex items-center justify-center w-full">
                         <label class="flex flex-col items-center justify-center w-full h-44 border-2 border-slate-300 border-dashed rounded-[32px] cursor-pointer bg-slate-50 hover:bg-slate-100 transition-all group">
                             <div class="flex flex-col items-center justify-center pt-5 pb-6">

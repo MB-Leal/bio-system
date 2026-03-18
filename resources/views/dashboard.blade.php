@@ -55,6 +55,7 @@
                             </div>
                             <div class="flex-1">
                                 <p class="text-sm font-bold text-slate-800">{{ $student->name }}</p>
+                                <p class="text-[10px] font-black text-blue-500 uppercase">{{ $student->cell_group }}</p>
                                 <p class="text-[10px] text-slate-400 uppercase">{{ $student->attendances_count }} Presenças</p>
                             </div>
                         </div>

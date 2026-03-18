@@ -10,66 +10,61 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
         $table->id();
-        // Relacionamento com grupos (Professor)
         $table->foreignId('group_id')->nullable()->constrained()->onDelete('set null');
 
         // 1. Dados Pessoais
         $table->string('name', 100);
-        
-        // CORREÇÃO: Removido o ->change(). 
-        // O ->unique() aqui garante que NINGUÉM use o mesmo e-mail duas vezes.
         $table->string('email', 100)->unique(); 
-        
         $table->string('phone')->nullable();
+        $table->string('cell_group')->default('Não');
         $table->date('birth_date');
         $table->enum('gender', ['M', 'F']);
         
-        // DICA: Use decimal para altura e peso para evitar erros de arredondamento
-        $table->decimal('height', 4, 2); 
+        // 2. Medidas de Fita Iniciais (cm/m)
+        $table->decimal('height', 5, 2); 
         $table->decimal('weight', 5, 2)->nullable();
+        $table->decimal('bust', 5, 2)->nullable();
+        $table->decimal('waist', 5, 2)->nullable();
+        $table->decimal('abdomen', 5, 2)->nullable();
+        $table->decimal('hip', 5, 2)->nullable();
+        $table->decimal('right_arm', 5, 2)->nullable();
+        $table->decimal('left_arm', 5, 2)->nullable();
+        $table->decimal('right_thigh', 5, 2)->nullable();
+        $table->decimal('left_thigh', 5, 2)->nullable();
+        $table->decimal('right_calf', 5, 2)->nullable();
+        $table->decimal('left_calf', 5, 2)->nullable();
 
-        // 2. Anamnese - Hábitos
+        // 3. Bioimpedância Inicial
+        $table->decimal('bmi', 5, 2)->nullable();
+        $table->decimal('body_fat_pct', 5, 2)->nullable();
+        $table->decimal('fat_mass_kg', 5, 2)->nullable();
+        $table->decimal('muscle_mass_pct', 5, 2)->nullable();
+        $table->decimal('lean_mass_kg', 5, 2)->nullable();
+        $table->decimal('body_water_pct', 5, 2)->nullable();
+        $table->integer('visceral_fat')->nullable();
+        $table->decimal('bone_mass', 5, 2)->nullable();
+        $table->integer('bmr')->nullable();
+        $table->integer('metabolic_age')->nullable();
+
+        // 4. Anamnese - Hábitos e Saúde
         $table->text('sitting_time')->nullable();
         $table->text('physical_activity')->nullable();
-        $table->boolean('is_smoker')->default(false);
-        $table->text('diet_type')->nullable();
-        $table->text('fluid_intake')->nullable();
-
-        // 3. Histórico Médico
         $table->text('surgeries')->nullable();
-        $table->text('aesthetic_treatments')->nullable();
-        $table->text('allergies')->nullable();
-        $table->text('bowel_function')->nullable();
         $table->text('orthopedic_issues')->nullable();
-        $table->text('current_medical_treatment')->nullable();
-        $table->text('skin_acids')->nullable();
-        $table->text('orthomolecular_treatment')->nullable();
-        $table->text('body_care_products')->nullable(); 
 
-        // 4. Condições Específicas
-        $table->boolean('has_pacemaker')->default(false);
-        $table->text('metals_in_body')->nullable();
-        $table->text('oncology_history')->nullable();
-        $table->text('varicose_veins')->nullable();
-        $table->text('lesions')->nullable();
-        $table->boolean('is_hypertensive')->default(false);
-        $table->boolean('is_hypotensive')->default(false);
-        $table->boolean('is_epileptic')->default(false);
-        $table->boolean('is_diabetic')->default(false);
+        // 5. Histórico de Fraturas (Novos Campos)
+        $table->boolean('has_fracture')->default(false);
+        $table->text('fracture_location')->nullable();
+        $table->string('fracture_date')->nullable();
+        $table->text('implants_details')->nullable();
 
-        // 5. Saúde Feminina
+        // 6. Saúde Feminina
         $table->boolean('is_pregnant')->default(false);
         $table->integer('children_count')->nullable();
-        $table->boolean('regular_cycle')->default(true);
         $table->text('contraception_method')->nullable();
 
         $table->text('health_notes')->nullable(); 
         $table->timestamps();
-
-        // REMOVIDO: $table->unique(['name', 'email']);
-        // Motivo: Esta linha causava o erro "Key column email doesn't exist" 
-        // e permitiria e-mails iguais se os nomes fossem diferentes. 
-        // A regra de e-mail único já foi definida na linha 14.
     });
     }
 

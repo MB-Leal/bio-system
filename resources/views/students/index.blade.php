@@ -27,6 +27,7 @@
                                 <th class="py-4 px-2">Aluno</th>
                                 <th class="py-4 px-2">Status / Grupo</th>
                                 <th class="py-4 px-2">Última Avaliação</th>
+                                <th class="p-4 text-[10px] uppercase font-black text-slate-400 tracking-widest">Célula</th>
                                 <th class="py-4 px-2 text-right">Ações</th>
                             </tr>
                         </thead>
@@ -50,6 +51,11 @@
                                 </td>
                                 <td class="py-4 px-2 text-sm text-slate-500 font-medium">
                                     {{ $student->evaluations->first()?->evaluation_date->format('d/m/Y') ?? 'Nenhuma' }}
+                                </td>
+                                <td class="p-4">
+                                    <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase">
+                                        {{ $student->cell_group ?? 'N/A' }}
+                                    </span>
                                 </td>
                                 <td class="py-4 px-2">
                                     <div class="flex items-center justify-end gap-3">

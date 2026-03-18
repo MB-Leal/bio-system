@@ -10,6 +10,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RankingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,6 +66,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //rotas de usuários
     Route::resource('users', UserController::class);
+
+    //Ranqueamento por CL
+    Route::get('/ranking-cl', [RankingController::class, 'index'])->name('ranking.cl');
 
     // Perfil da Professora (Breeze Default)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

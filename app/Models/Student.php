@@ -9,25 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Student extends Model
 {
     protected $fillable = [
-        'group_id',
-        'name',
-        'phone',
-        'email',
-        'birth_date',
-        'gender',
-        'height',
-        'weight',
-        'health_notes',
-        'is_smoker',
-        'is_hypertensive',
-        'is_diabetic',
-        'has_pacemaker',
-        'is_epileptic',
-        'surgeries',
-        'children_count',
-        'is_pregnant',
-        'contraception_method',
-    ];
+    'group_id', 'name', 'phone', 'email', 'cell_group','birth_date', 'gender',
+    'height', 'weight', 'bust', 'waist', 'abdomen', 'hip', 
+    'right_arm', 'left_arm', 'right_thigh', 'left_thigh', 'right_calf', 'left_calf',
+    'bmi', 'body_fat_pct', 'fat_mass_kg', 'muscle_mass_pct', 'lean_mass_kg', 
+    'body_water_pct', 'visceral_fat', 'bone_mass', 'bmr', 'metabolic_age',
+    'sitting_time', 'physical_activity', 'surgeries', 'orthopedic_issues',
+    'has_fracture', 'fracture_location', 'fracture_date', 'implants_details',
+    'is_pregnant', 'children_count', 'contraception_method', 'health_notes'
+];
 
     protected $casts = [
         'birth_date' => 'date',

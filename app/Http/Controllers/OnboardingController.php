@@ -17,68 +17,49 @@ class OnboardingController extends Controller
 
     public function store(Request $request)
     {
-        // Limpa o telefone: remove parênteses, espaços e traços
+        // 1. Limpeza e Validação
         $phoneCleaned = preg_replace('/[^0-9]/', '', $request->phone);
-
-        // Substitui o valor no request para a validação aceitar
         $request->merge(['phone' => substr($phoneCleaned, 0, 11)]);
 
-        // 1. Validação com mensagens em Português (graças ao pacote que instalamos)
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|max:100|unique:students,email',
             'birth_date' => 'required|date',
             'gender' => 'required|in:M,F',
             'height' => 'required|numeric',
+            'weight' => 'nullable|numeric',
             'exam_pdf' => 'nullable|mimes:pdf|max:10240',
         ], [
-            // Mensagem personalizada (opcional)
             'email.unique' => 'Este e-mail já está cadastrado em nosso sistema.'
         ]);
 
-        // 2. Criar o Aluno (Anamnese e Dados Fixos)
-        // O $request->all() funciona aqui porque definimos 'protected $guarded = []' no Model
+        // 2. Criar o Aluno (Dados de Perfil e Anamnese)
+        // Agora incluindo os campos de Peso, Célula e Fraturas
         $student = Student::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'birth_date' => $request->birth_date,
-            'gender' => $request->gender,
-            'height' => $request->height,
+            'name'         => $request->name,
+            'email'        => $request->email,
+            'phone'        => $request->phone,
+            'birth_date'   => $request->birth_date,
+            'gender'       => $request->gender,
+            'cell_group'   => $request->cell_group, // Salvando a CL
+            'height'       => $request->height,
+            'weight'       => $request->weight,     // AGORA O PESO INICIAL SALVA AQUI!
 
-            // Hábitos
-            'sitting_time' => $request->sitting_time,
+            // Hábitos e Saúde
+            'sitting_time'      => $request->sitting_time,
             'physical_activity' => $request->physical_activity,
-            'is_smoker' => $request->has('is_smoker'),
-            'diet_type' => $request->diet_type,
-            'fluid_intake' => $request->fluid_intake,
-
-            // Saúde Geral
-            'surgeries' => $request->surgeries,
-            'aesthetic_treatments' => $request->aesthetic_treatments,
-            'allergies' => $request->allergies,
-            'bowel_function' => $request->bowel_function,
+            'surgeries'         => $request->surgeries,
             'orthopedic_issues' => $request->orthopedic_issues,
-            'current_medical_treatment' => $request->current_medical_treatment,
-            'skin_acids' => $request->skin_acids,
-            'orthomolecular_treatment' => $request->orthomolecular_treatment,
-            'body_care_products' => $request->body_care_products,
 
-            // Condições Específicas
-            'has_pacemaker' => $request->has('has_pacemaker'),
-            'metals_in_body' => $request->metals_in_body,
-            'oncology_history' => $request->oncology_history,
-            'varicose_veins' => $request->varicose_veins,
-            'lesions' => $request->lesions,
-            'is_hypertensive' => $request->has('is_hypertensive'),
-            'is_hypotensive' => $request->has('is_hypotensive'),
-            'is_epileptic' => $request->has('is_epileptic'),
-            'is_diabetic' => $request->has('is_diabetic'),
+            // Histórico de Fraturas
+            'has_fracture'      => $request->has('has_fracture'),
+            'fracture_location' => $request->fracture_location,
+            'fracture_date'     => $request->fracture_date,
+            'implants_details'  => $request->implants_details,
 
             // Saúde Feminina
-            'is_pregnant' => $request->has('is_pregnant'),
-            'children_count' => $request->children_count,
-            'regular_cycle' => $request->has('regular_cycle') || $request->gender === 'M',
+            'is_pregnant'          => $request->has('is_pregnant'),
+            'children_count'       => $request->children_count,
             'contraception_method' => $request->contraception_method,
         ]);
 
@@ -88,36 +69,36 @@ class OnboardingController extends Controller
             $path = $request->file('exam_pdf')->store('exams', 'public');
         }
 
-        // 4. Criar a primeira Avaliação (Bioimpedância e Medidas)
+        // 4. Criar a primeira Avaliação (Histórico de Evolução)
         $student->evaluations()->create([
-            'evaluation_date' => now(), // Já usará o horário de Belém configurado
-            'hash_slug' => Str::random(10),
-            'exam_pdf_path' => $path,
+            'evaluation_date' => now(),
+            'hash_slug'       => Str::random(10),
+            'exam_pdf_path'   => $path,
 
             // Medidas de Fita
-            'weight' => $request->weight,
-            'bust' => $request->bust,
-            'waist' => $request->waist,
-            'abdomen' => $request->abdomen,
-            'hip' => $request->hip,
-            'right_arm' => $request->right_arm,
-            'left_arm' => $request->left_arm,
+            'weight'      => $request->weight,
+            'bust'        => $request->bust,
+            'waist'       => $request->waist,
+            'abdomen'     => $request->abdomen,
+            'hip'         => $request->hip,
+            'right_arm'   => $request->right_arm,
+            'left_arm'    => $request->left_arm,
             'right_thigh' => $request->right_thigh,
-            'left_thigh' => $request->left_thigh,
-            'right_calf' => $request->right_calf,
-            'left_calf' => $request->left_calf,
+            'left_thigh'  => $request->left_thigh,
+            'right_calf'  => $request->right_calf,
+            'left_calf'   => $request->left_calf,
 
             // Dados da Balança
-            'bmi' => $request->bmi,
-            'body_fat_pct' => $request->body_fat_pct,
-            'fat_mass_kg' => $request->fat_mass_kg,
+            'bmi'             => $request->bmi,
+            'body_fat_pct'    => $request->body_fat_pct,
+            'fat_mass_kg'     => $request->fat_mass_kg,
             'muscle_mass_pct' => $request->muscle_mass_pct,
-            'lean_mass_kg' => $request->lean_mass_kg,
-            'body_water_pct' => $request->body_water_pct,
-            'visceral_fat' => $request->visceral_fat,
-            'bone_mass' => $request->bone_mass,
-            'bmr' => $request->bmr,
-            'metabolic_age' => $request->metabolic_age,
+            'lean_mass_kg'    => $request->lean_mass_kg,
+            'body_water_pct'  => $request->body_water_pct,
+            'visceral_fat'    => $request->visceral_fat,
+            'bone_mass'       => $request->bone_mass,
+            'bmr'             => $request->bmr,
+            'metabolic_age'   => $request->metabolic_age,
         ]);
 
         return redirect()->route('onboarding.success');
