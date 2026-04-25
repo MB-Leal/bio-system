@@ -35,8 +35,14 @@
                             @forelse($students as $student)
                             <tr class="hover:bg-slate-50/50 transition-colors">
                                 <td class="py-4 px-2">
-                                    <div class="font-bold text-slate-800">{{ $student->name }}</div>
-                                    <div class="text-xs text-slate-400 font-medium">{{ $student->email }}</div>
+                                    <a href="{{ route('students.show', $student) }}" class="group">
+                                        <div class="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
+                                            {{ $student->name }}
+                                        </div>
+                                        <div class="text-xs text-slate-400 font-medium">
+                                            {{ $student->email }}
+                                        </div>
+                                    </a>
                                 </td>
                                 <td class="py-4 px-2">
                                     @if($student->group)
