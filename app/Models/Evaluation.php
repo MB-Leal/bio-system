@@ -6,41 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Str;
 
-
 class Evaluation extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'student_id', 'evaluation_date', 'weight', 'body_fat_pct', 'visceral_fat', 
+        'muscle_mass_pct', 'waist', 'abdomen', 'hip', 'right_arm', 'left_arm', 
+        'right_thigh', 'left_thigh', 'right_calf', 'left_calf', 'hash_slug'
+    ];
 
     protected $casts = [
         'evaluation_date' => 'date',
     ];
 
-    protected $fillable = [
-        'student_id',
-        'evaluation_date',
-        'weight',
-        'height',
-        'body_fat_pct',
-        'visceral_fat',
-        'muscle_mass_pct',
-        'waist',
-        'abdomen',
-        'hip',
-        'right_arm',
-        'left_arm',
-        'right_thigh',
-        'left_thigh',
-        'right_calf',
-        'left_calf',
-    ];
-
-    // Relacionamento
     public function student()
     {
         return $this->belongsTo(Student::class);
     }
 
-    // Gerar o hash automaticamente ao criar
     protected static function booted()
     {
         static::creating(function ($evaluation) {
@@ -48,39 +30,49 @@ class Evaluation extends Model
         });
     }
 
-    // Cálculo do IMC
+    /**
+     * Cálculo do IMC Seguro (Proteção contra divisão por zero)
+     */
     protected function imc(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->weight / (pow($this->student->height, 2))
+            get: function () {
+                $height = $this->student->height ?? 0;
+                $weight = $this->weight ?? 0;
+
+                if ($height <= 0 || $weight <= 0) {
+                    return 0;
+                }
+
+                return round($weight / ($height * $height), 2);
+            }
         );
     }
 
-    // Massa Gorda em KG
     protected function fatMassKg(): Attribute
     {
         return Attribute::make(
-            get: fn() => ($this->weight * $this->body_fat_pct) / 100
+            get: fn() => $this->weight > 0 ? round(($this->weight * ($this->body_fat_pct ?? 0)) / 100, 2) : 0
         );
     }
 
-    // Massa Muscular em KG
     protected function muscleMassKg(): Attribute
     {
         return Attribute::make(
-            get: fn() => ($this->weight * $this->muscle_mass_pct) / 100
+            get: fn() => $this->weight > 0 ? round(($this->weight * ($this->muscle_mass_pct ?? 0)) / 100, 2) : 0
         );
     }
+
     public function getWhatsappUrl()
     {
         $url = route('public.report', $this->hash_slug);
         $studentName = $this->student->name;
-
-        // Mensagem personalizada
         $message = "Olá {$studentName}! Sua nova avaliação física está pronta. Confira seus resultados aqui: {$url}";
-
-        // Limpa o número de telefone (remove espaços, parênteses, etc)
         $phone = preg_replace('/[^0-9]/', '', $this->student->phone ?? '');
+        
+        if (strlen($phone) == 11) {
+            $phone = "55" . $phone;
+        }
 
         return "https://wa.me/{$phone}?text=" . urlencode($message);
     }

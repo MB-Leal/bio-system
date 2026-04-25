@@ -28,7 +28,10 @@
                             </span>
                             <div>
                                 <p class="text-lg font-black text-slate-800">{{ $student->name }}</p>
-                                <p class="text-xs font-bold text-slate-500">Última presença: {{ $student->attendances->last()?->attendance_date->format('d/m/Y') ?? 'Nenhuma' }}</p>
+                                <p class="text-xs font-bold text-slate-500">
+                                    Última presença: 
+                                    {{ $student->attendances->first() ? $student->attendances->first()->created_at->format('d/m/Y') : 'Nenhuma' }}
+                                </p>
                             </div>
                         </div>
                         <div class="text-right">
