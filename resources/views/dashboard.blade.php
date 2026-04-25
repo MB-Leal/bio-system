@@ -42,32 +42,15 @@
                 <div class="p-5 border-b border-slate-50 flex justify-between items-center">
                     <h3 class="font-bold text-slate-800 italic">⚠️ Avaliações Pendentes (+30 dias)</h3>
                 </div>
-                <div class="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100">
-                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                        <span class="w-2 h-4 bg-emerald-500 rounded-full"></span>
-                        Ranking de Frequência (Top 5)
-                    </h3>
-                    <div class="space-y-4">
-                        @foreach($ranking as $student)
-                        <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-3xl">
-                            <div class="w-8 h-8 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black text-xs">
-                                {{ $loop->iteration }}º
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-bold text-slate-800">{{ $student->name }}</p>
-                                <p class="text-[10px] font-black text-blue-500 uppercase">{{ $student->cell_group }}</p>
-                                <p class="text-[10px] text-slate-400 uppercase">{{ $student->attendances_count }} Presenças</p>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
+
                 <div class="divide-y divide-slate-50">
                     @forelse($pendingEvaluations as $student)
                     <div class="p-4 flex items-center justify-between">
                         <div>
                             <p class="text-sm font-bold text-slate-700">{{ $student->name }}</p>
-                            <p class="text-[10px] text-slate-400">Última: {{ $student->evaluations->first()?->evaluation_date->format('d/m/Y') ?? 'Nunca avaliado' }}</p>
+                            <p class="text-[10px] text-slate-400 uppercase italic">
+                                Última: {{ $student->evaluations->sortByDesc('evaluation_date')->first()?->evaluation_date->format('d/m/Y') ?? 'Nunca avaliado' }}
+                            </p>
                         </div>
                         <a href="{{ route('students.evaluations.create', $student) }}" class="text-xs font-bold text-blue-600 hover:underline">Avaliar agora</a>
                     </div>
@@ -75,21 +58,56 @@
                     <div class="p-10 text-center text-slate-400 text-sm italic">Tudo em dia! Todos os alunos foram avaliados recentemente.</div>
                     @endforelse
                 </div>
+
+                <div class="p-8 bg-slate-50/50 border-t border-slate-100">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <span class="w-2 h-4 bg-emerald-500 rounded-full"></span>
+                        Ranking de Frequência (Top 5)
+                    </h3>
+                    <div class="space-y-4">
+                        @foreach($ranking as $student)
+                        <div class="flex items-center gap-4 p-4 bg-white rounded-3xl border border-slate-100 shadow-sm">
+                            <div class="w-8 h-8 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black text-xs">
+                                {{ $loop->iteration }}º
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-bold text-slate-800">{{ $student->name }}</p>
+                                <p class="text-[10px] font-black text-blue-500 uppercase">{{ $student->cell_group ?? 'Sem CL' }}</p>
+                                <p class="text-[10px] text-slate-400 uppercase font-bold">{{ $student->attendances_count }} Presenças</p>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
 
-            <div class="bg-slate-900 rounded-3xl shadow-xl p-6 text-white">
-                <h3 class="font-black uppercase tracking-tighter text-blue-400 mb-6 text-center">🏆 Destaques do Mês</h3>
+            <div class="bg-slate-900 rounded-[40px] shadow-xl p-8 text-white">
+                <h3 class="font-black uppercase tracking-tighter text-blue-400 mb-8 text-center italic">🏆 Destaques do Mês (Evolução)</h3>
                 <div class="space-y-4">
                     @foreach($topPerformers as $eval)
-                    <div class="flex items-center gap-4 bg-slate-800 p-4 rounded-2xl border border-slate-700">
-                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold text-sm">
+                    @php
+                    // Proteção: busca o peso inicial do cadastro do aluno
+                    $pInicial = $eval->student?->weight ?? 0;
+                    $diff = $pInicial > 0 ? ($eval->weight - $pInicial) : 0;
+                    @endphp
+                    <div class="flex items-center gap-4 bg-slate-800 p-4 rounded-3xl border border-slate-700 transition-hover hover:scale-[1.02]">
+                        <div class="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-sm italic shadow-lg shadow-blue-900/20">
                             {{ $loop->iteration }}º
                         </div>
                         <div class="flex-1">
-                            <p class="font-bold text-sm">{{ $eval->student->name }}</p>
-                            <p class="text-[10px] text-slate-400 uppercase">{{ $eval->body_fat_pct }}% de Gordura Corporal</p>
+                            <p class="font-black text-sm text-white">
+                                {{ $eval->student->name ?? $eval->name ?? 'Nome indisponível' }}
+                            </p>
+                            <p class="text-[10px] text-slate-400 uppercase font-bold">
+                                Atual: {{ number_format($eval->weight, 1) }}kg
+                                @if($diff != 0)
+                                ({{ $diff > 0 ? '+' : '' }}{{ number_format($diff, 1) }}kg total)
+                                @endif
+                            </p>
                         </div>
-                        <div class="text-emerald-400 font-black text-sm italic">Evoluindo!</div>
+                        <div class="text-emerald-400 font-black text-xs uppercase tracking-widest italic">
+                            {{ $diff <= 0 ? 'Evoluindo!' : 'Foco!' }}
+                        </div>
                     </div>
                     @endforeach
                 </div>

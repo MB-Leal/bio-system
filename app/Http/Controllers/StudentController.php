@@ -58,11 +58,16 @@ class StudentController extends Controller
 
     public function show(Student $student)
     {
-        $student->load(['group', 'evaluations' => function ($query) {
-            $query->orderBy('evaluation_date', 'desc');
-        }]);
+        // Carrega o grupo do aluno
+        $student->load(['group']);
 
-        return view('students.show', compact('student'));
+        // Pega todas as avaliações ordenadas pela mais recente
+        $evaluations = $student->evaluations()->orderBy('evaluation_date', 'desc')->get();
+
+        // Pega a avaliação mais recente para o Dashboard do topo
+        $latest = $evaluations->first();
+
+        return view('students.show', compact('student', 'evaluations', 'latest'));
     }
 
     public function edit(Student $student)
@@ -102,26 +107,31 @@ class StudentController extends Controller
     {
         return $request->validate([
             'name' => 'required|string|max:100',
-            'email' => 'required|email|max:100|unique:students,email,' . $id,
-            'phone' => 'nullable|string|max:20',
+            'email' => 'required|email|unique:students,email,' . $id,
+            'phone' => 'required',
             'birth_date' => 'required|date',
             'gender' => 'required|in:M,F',
             'height' => 'required|numeric',
-            'weight' => 'required|numeric', // Peso de referência inicial
-            'cell_group' => 'nullable|string',
-            'group_id' => 'nullable|exists:groups,id',
-
-            // Dados de Saúde/Anamnese
+            'weight' => 'required|numeric',
+            // Medidas Iniciais (opcionais no cadastro/edição)
+            'bust' => 'nullable|numeric',
+            'waist' => 'nullable|numeric',
+            'abdomen' => 'nullable|numeric',
+            'hip' => 'nullable|numeric',
+            'right_arm' => 'nullable|numeric',
+            'left_arm' => 'nullable|numeric',
+            'right_thigh' => 'nullable|numeric',
+            'left_thigh' => 'nullable|numeric',
+            'right_calf' => 'nullable|numeric',
+            'left_calf' => 'nullable|numeric',
+            'body_fat_pct' => 'nullable|numeric',
+            'muscle_mass_pct' => 'nullable|numeric',
+            'visceral_fat' => 'nullable|integer',
+            // Anamnese
             'sitting_time' => 'nullable|string',
             'physical_activity' => 'nullable|string',
             'surgeries' => 'nullable|string',
             'orthopedic_issues' => 'nullable|string',
-            'fracture_location' => 'nullable|string',
-            'fracture_date' => 'nullable|string',
-            'implants_details' => 'nullable|string',
-            'health_notes' => 'nullable|string',
-
-            'exam_pdf' => 'nullable|mimes:pdf|max:10240',
         ]);
     }
 

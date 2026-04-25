@@ -135,7 +135,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                         <div class="space-y-6">
                             <h3 class="font-black text-slate-400 uppercase text-[10px] tracking-widest border-b pb-2">Hábitos</h3>
-                            <div><x-input-label value="Permanece muito tempo sentada?" /><x-text-input name="sitting_time" class="w-full mt-1" /></div>
+                            <div><x-input-label value="Permanece muito tempo sentado(a)?" /><x-text-input name="sitting_time" class="w-full mt-1" /></div>
                             <div><x-input-label value="Atividade física? Quais?" /><x-text-input name="physical_activity" class="w-full mt-1" /></div>
                         </div>
 

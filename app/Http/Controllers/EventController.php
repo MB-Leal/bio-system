@@ -89,9 +89,13 @@ class EventController extends Controller
      */
     public function cancel(Event $event)
     {
-        // Apenas eventos agendados podem ser cancelados
-        $event->update(['status' => 'cancelled']);
+        // Atualiza o status para cancelado
+        $event->update([
+            'status' => 'canceled'
+        ]);
 
-        return redirect()->route('events.index')->with('success', 'Aula cancelada com sucesso!');
+        // Redireciona de volta com uma mensagem de sucesso
+        return redirect()->route('events.show', $event)
+            ->with('success', 'Aula cancelada com sucesso.');
     }
 }

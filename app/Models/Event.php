@@ -11,6 +11,7 @@ class Event extends Model
         'group_id',
         'title',
         'scheduled_at',
+        'status',
         'description',
         'user_id' // Certifique-se de incluir o user_id se ele for salvo via create também
     ];
